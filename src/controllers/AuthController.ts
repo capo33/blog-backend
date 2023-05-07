@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { Types } from "mongoose";
 import jwt, { Jwt, JwtPayload, Secret } from "jsonwebtoken";
 import bcrypt from "bcrypt";
@@ -8,7 +8,7 @@ import { generateToken } from "../utils/JwtToken";
 // @desc    Register user
 // @route   POST /api/v1/auth/register
 // @access  Public
-export const register = async (req: Request, res: Response) => {
+const register = async (req: Request, res: Response) => {
   const { name, email, password, answer } = req.body;
 
   try {
@@ -59,8 +59,10 @@ export const register = async (req: Request, res: Response) => {
 // @desc    Login user
 // @route   POST /api/v1/auth/login
 // @access  Public
-export const login = async (req: Request, res: Response) => {
+const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
+  console.log(email, password);
+
   try {
     // Check if user exists
     const existingUser = await UserModel.findOne({ email });
@@ -107,16 +109,31 @@ export const login = async (req: Request, res: Response) => {
 // @desc    Get user profile
 // @route   GET /api/v1/auth/profile
 // @access  Private
-export const getProfile = async (req: Request, res: Response) => {
+const getProfile = async (req: Request, res: Response) => {
   try {
     // get user from req.user
-    const user = req.user;
+    const user = await UserModel.findById(req.user?._id).select("-password");
+
+    // check user existince
+    if (!user) {
+      res.status(400);
+      throw new Error("User not found");
+    }
+
+    // generate token
+    const token = generateToken(user?._id);
+
+    // Remove password
+    const { password: _, ...result } = user.toObject();
+
+    console.log(user);
 
     // send response
     res.status(200).json({
       success: true,
-      message: "User profile fetched successfully",
-      user,
+      message: "User found",
+      result,
+      token,
     });
 
     // catch errors
@@ -129,3 +146,106 @@ export const getProfile = async (req: Request, res: Response) => {
       });
   }
 };
+
+// @desc    Update user profile
+// @route   PUT /api/v1/auth/update
+// @access  Private
+const updateProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Check if user exists
+    const user = await UserModel.findById(req.user?._id); // req.user?._id is set by the auth middleware
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // generate salt to hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      req.user?._id,
+      { ...req.body, password: hashedPassword },
+      { new: true }
+    );
+    // Create token
+    const token = generateToken(updatedUser?._id);
+
+    // send response
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser,
+      token,
+    });
+
+    // catch errors
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update user password
+// @route   PUT /api/v1/auth/update-password
+// @access  Private
+const updatePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Check if user exists
+    const user = await UserModel.findById(req.user?._id); // req.user?._id is set by the auth middleware
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // compare passwords
+    const isPasswordCorrect = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+
+    if (!isPasswordCorrect) {
+      throw new Error("Invalid credentials");
+    }
+
+    // generate salt to hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      req.user?._id,
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    // Create token
+    const token = generateToken(updatedUser?._id);
+
+    // Remove password
+    // const { password: _, ...userWithoutPassword } =  updatedUser?.toObject();
+
+    // send response
+    res.status(200).json({
+      success: true,
+
+      message: "Password updated successfully",
+
+      user: updatedUser,
+
+      token,
+    });
+
+    // catch errors
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { register, login, getProfile, updateProfile, updatePassword };

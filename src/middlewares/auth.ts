@@ -3,7 +3,7 @@ import jwt, { Secret } from "jsonwebtoken";
 
 import UserModel from "../models/User";
 import { IPayload } from "../interfaces/authInterface";
-
+ 
 // Auth middleware
 const auth = async (req: Request, res: Response, next: NextFunction) => {
   let token;
@@ -23,7 +23,10 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
       ) as IPayload;
 
       // Get user from the token
-      req.user = await UserModel.findById(decoded?.id).select("-password");
+      const user = await UserModel.findById(decoded.id);
+      
+       // Attach user to request object
+      req.user = user;
       next();
     } catch (error) {
       console.error(error);

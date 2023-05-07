@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import { IUser } from "../interfaces/userInterface";
 
-const userSchema = new Schema(
+const userSchema = new Schema<IUser>(
   {
     name: {
       type: String,
@@ -30,7 +30,7 @@ const userSchema = new Schema(
       enum: ["admin", "user"],
     },
     interests: {
-      type: Array,
+      type: [String],
       default: [],
     },
     about: {
@@ -53,7 +53,7 @@ const userSchema = new Schema(
     },
     birthday: {
       type: Date,
-      default: "",
+      // default: "",
     },
   },
   { timestamps: true }
