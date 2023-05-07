@@ -29,6 +29,10 @@ class NotFoundError extends Error {
 const notFound = (req: Request, res: Response, next: NextFunction) => {
   let error = new NotFoundError(`Not Found - ${req.originalUrl}`);
   error.statusCode = 404;
+  res.status(404).json({
+    message: error.message,
+    stack: process.env.NODE_ENV === "production" ? null : error.stack, // only show stack in development mode
+  });
   next(error);
 };
 

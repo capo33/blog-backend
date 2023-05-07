@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
 export interface IUser extends Document {
   name: string;
@@ -9,7 +9,7 @@ export interface IUser extends Document {
   role: string;
   interests: string[];
   about: string;
-  blogs: string[];
+  blogs: Types.ObjectId[];
   phone: string;
   address: string;
   birthday: Date;
