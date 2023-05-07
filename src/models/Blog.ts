@@ -6,16 +6,15 @@ const BlogSchema = new Schema<IBlog>(
   {
     title: {
       type: String,
-      required: [true, "Please add a title"],
+      // required: [true, "Please add a title"],
     },
     description: {
       type: String,
-      required: [true, "Please add a description"],
+      // required: [true, "Please add a description"],
     },
     photo: {
       type: String,
-      default:
-        "https://t4.ftcdn.net/jpg/04/99/93/31/360_F_499933117_ZAUBfv3P1HEOsZDrnkbNCt4jc3AodArl.jpg",
+      default: "https://t4.ftcdn.net/jpg/04/99/93/31/360_F_499933117_ZAUBfv3P1HEOsZDrnkbNCt4jc3AodArl.jpg",
     },
     author: {
       type: Schema.Types.ObjectId,

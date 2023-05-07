@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { Types } from "mongoose";
-import jwt, { Jwt, JwtPayload, Secret } from "jsonwebtoken";
 import bcrypt from "bcrypt";
+
 import UserModel from "../models/User";
 import { generateToken } from "../utils/JwtToken";
 
