@@ -5,15 +5,8 @@ export interface ErrnoException extends Error {
   statusCode?: number;
 }
 
-// error handler middleware
-const errorHandler = (
-  err: ErrnoException,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  console.log(err.stack);
-
+// Error handler middleware
+const errorHandler = (err: ErrnoException, req: Request, res: Response) => {
   // set status code
   const statusCode = err.statusCode || 400;
 
@@ -24,11 +17,19 @@ const errorHandler = (
   });
 };
 
-// invalid path error handler middleware
+// Not found error
+class NotFoundError extends Error {
+  statusCode: number;
+  constructor(message: string) {
+    super(message);
+    this.statusCode = 404;
+  }
+}
+
 const notFound = (req: Request, res: Response, next: NextFunction) => {
-  const err = new Error(`Not found - ${req.originalUrl}`);
-  res.status(404);
-  next(err);
+  let error = new NotFoundError(`Not Found - ${req.originalUrl}`);
+  error.statusCode = 404;
+  next(error);
 };
 
 export { errorHandler, notFound };

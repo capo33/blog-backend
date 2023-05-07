@@ -1,8 +1,9 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import * as dotenv from "dotenv";
 import cors from "cors";
 
 import authRoutes from "./routes/Auth.routes";
+import { errorHandler, notFound } from "./middlewares/errorHandler";
 
 // Load env vars
 dotenv.config();
@@ -17,7 +18,7 @@ app.use(cors());
 
 // Welcome route
 app.get("/", async (req: Request, res: Response): Promise<Response> => {
-  return res.json({ 
+  return res.json({
     message: "Welcome to the MongoDB API",
     author: "Mohamed Capo",
     version: "1.0.0",
@@ -26,5 +27,9 @@ app.get("/", async (req: Request, res: Response): Promise<Response> => {
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
+
+// Error handler middleware
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

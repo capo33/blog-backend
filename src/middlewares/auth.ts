@@ -41,7 +41,7 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-// admin middleware based on role
+// Admin middleware based on role
 const admin = async (req: Request, res: Response, next: NextFunction) => {
   if (req.user && req.user.role === "admin") {
     next();

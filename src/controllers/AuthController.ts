@@ -185,7 +185,7 @@ const updateProfile = async (
 
     // catch errors
   } catch (error) {
-    next(error);
+    if (error instanceof Error) next(error.message);
   }
 };
 
@@ -228,24 +228,109 @@ const updatePassword = async (
     // Create token
     const token = generateToken(updatedUser?._id);
 
-    // Remove password
-    // const { password: _, ...userWithoutPassword } =  updatedUser?.toObject();
-
     // send response
     res.status(200).json({
       success: true,
-
       message: "Password updated successfully",
-
       user: updatedUser,
-
       token,
     });
 
     // catch errors
   } catch (error) {
-    next(error);
+    if (error instanceof Error) next(error.message);
   }
 };
 
-export { register, login, getProfile, updateProfile, updatePassword };
+// @desc    Get all users
+// @route   GET /api/v1/auth/users
+// @access  Private/Admin
+const getUsers = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // get users
+    const users = await UserModel.find({}).select("-password");
+
+    // send response
+    res.status(200).json({
+      success: true,
+      message: "List of users",
+      users,
+    });
+
+    // catch errors
+  } catch (error) {
+    if (error instanceof Error) next(error.message);
+  }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/v1/auth/user/:id
+// @access  Private/Admin or User
+const deleteUserByUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // get user
+    const user = await UserModel.findById(req.user?._id);
+
+    // check user existince
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if user is authorized to delete the user
+    if (
+      user._id.toString() !== req.user?._id.toString() &&
+      req.user?.role !== "admin"
+    ) {
+      throw new Error("You are not authorized to delete this user");
+    }
+    // Delete user
+    await user.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Sad to see you go, user deleted successfully",
+    });
+
+    //  catch errors
+  } catch (error) {
+    if (error instanceof Error) next(error.message);
+  }
+};
+
+// @desc    Delete users
+// @route   DELETE /api/v1/auth/users/:id
+// @access  Private/Admin
+const deleteUserByAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = await UserModel.findById(req.params.id);
+    // Check if user exists
+    if (!user) {
+      throw new Error("User not found");
+    }
+    // Check if admin is authorized to delete the user
+    if (req.user?.role !== "admin") {
+      throw new Error("You are not authorized to delete this user");
+    }
+
+    // Delete user
+    await user.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    if (error instanceof Error) next(error.message);
+  }
+};
+
+export {
+  register,
+  login,
+  getProfile,
+  updateProfile,
+  updatePassword,
+  getUsers,
+  deleteUserByUser,
+  deleteUserByAdmin,
+};
