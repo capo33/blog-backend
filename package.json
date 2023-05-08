@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./build/app.js",
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "ts-node-dev --rs --poll src/index.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
