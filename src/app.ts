@@ -1,4 +1,4 @@
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import * as dotenv from "dotenv";
 import cors from "cors";
 
@@ -21,13 +21,6 @@ app.use(cors());
 
 // Static folder
 app.use("/uploads", express.static(__dirname + "/uploads"));
-
-// // File upload route
-// app.post('/uploads', (req: Request, res: Response, next: NextFunction) => {
-//   res.json({
-//     message: 'File uploaded successfully'
-//   })
-// })
 
 // Welcome route
 app.get("/", async (req: Request, res: Response): Promise<Response> => {
