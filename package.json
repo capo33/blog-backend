@@ -5,9 +5,9 @@
   "author": "mohamed",
   "license": "MIT",
   "scripts": {
-    "start": "node ./build/index.js",
+    "start": "yarn build && node build/index.js",
     "dev": "ts-node-dev --rs --poll src/index.ts",
-    "build": "cd backend && yarn && yarn run build",
+    "build": "rimraf ./build && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
