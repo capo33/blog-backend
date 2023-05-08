@@ -24,10 +24,12 @@ const BlogSchema = new Schema<IBlog>(
       type: Schema.Types.ObjectId,
       ref: "Category",
     },
-    likes: {
-      type: [String], // array of user ids who liked the post
-      default: [],
-    },
+    likes: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     views: {
       type: Number,
       default: 0,

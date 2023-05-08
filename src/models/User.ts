@@ -36,7 +36,7 @@ const userSchema = new Schema<IUser>(
     },
     about: {
       type: String,
-      default: "",
+      default: "example: I am a photographer",
     },
     blogs: [
       {
@@ -46,15 +46,15 @@ const userSchema = new Schema<IUser>(
     ],
     phone: {
       type: String,
-      default: "",
+      default: "XXX-XXX-XXXX",
     },
     address: {
       type: String,
-      default: "",
+      default: "1234 Main St",
     },
     birthday: {
       type: Date,
-      // default: "",
+      default: Date.now,
     },
   },
   { timestamps: true }

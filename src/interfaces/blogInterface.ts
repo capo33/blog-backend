@@ -6,7 +6,7 @@ export interface IBlog extends Document {
   photo: string;
   author:  Types.ObjectId;
   category:  Types.ObjectId;
-  likes: string[];
+  likes:  Types.ObjectId[];
   views: number;
   featured: boolean;
   tags: string[];
